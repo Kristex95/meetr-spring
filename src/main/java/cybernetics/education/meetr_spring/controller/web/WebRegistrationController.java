@@ -1,5 +1,6 @@
 package cybernetics.education.meetr_spring.controller.web;
 
+import cybernetics.education.meetr_spring.dto.UserDto;
 import cybernetics.education.meetr_spring.dto.request.RegistrationRequest;
 import cybernetics.education.meetr_spring.model.User;
 import cybernetics.education.meetr_spring.service.UserService;
@@ -24,7 +25,7 @@ public class WebRegistrationController {
 
 	@PostMapping("/api/register")
 	public String registerUser(RegistrationRequest request, RedirectAttributes redirectAttributes) {
-		User user = userService.registerUser(request.getUsername(), request.getEmail(), request.getPassword());
+		UserDto user = userService.registerUser(request.getUsername(), request.getEmail(), request.getPassword());
 		redirectAttributes.addFlashAttribute("username", user.getUsername());
 		// Redirect to the main page (use the appropriate mapping for your main page)
 		return "redirect:/main";

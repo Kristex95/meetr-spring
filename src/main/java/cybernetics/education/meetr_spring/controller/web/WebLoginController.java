@@ -1,5 +1,6 @@
 package cybernetics.education.meetr_spring.controller.web;
 
+import cybernetics.education.meetr_spring.dto.UserDto;
 import cybernetics.education.meetr_spring.model.User;
 import cybernetics.education.meetr_spring.service.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,7 +29,7 @@ public class WebLoginController {
 	public String loginUser(@RequestParam("email") String email,
 							@RequestParam("password") String password,
 							Model model) {
-		User user = userService.findByEmail(email);
+		final UserDto user = userService.getUser(email);
 
 		if (user != null && passwordEncoder.matches(password, user.getPassword())) {
 			// Add username to the model to show on the main page
