@@ -1,9 +1,8 @@
 package cybernetics.education.meetr_spring.controller;
 
-import cybernetics.education.meetr_spring.dto.UserBaseDto;
-import cybernetics.education.meetr_spring.dto.UserDto;
+import cybernetics.education.meetr_spring.dto.User.UserBaseDto;
+import cybernetics.education.meetr_spring.dto.User.UserDto;
 import cybernetics.education.meetr_spring.dto.response.Response;
-import cybernetics.education.meetr_spring.model.User;
 import cybernetics.education.meetr_spring.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,7 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
 
-	private UserService userService;
+	private final UserService userService;
 
 	@GetMapping
 	public ResponseEntity<Response<List<UserDto>>> getAllUsers() {

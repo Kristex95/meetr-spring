@@ -1,10 +1,11 @@
-package cybernetics.education.meetr_spring.dto;
+package cybernetics.education.meetr_spring.dto.User;
 
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserDto extends UserBaseDto {

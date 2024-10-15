@@ -1,7 +1,6 @@
 package cybernetics.education.meetr_spring.controller.web;
 
-import cybernetics.education.meetr_spring.dto.UserDto;
-import cybernetics.education.meetr_spring.model.User;
+import cybernetics.education.meetr_spring.dto.User.UserDto;
 import cybernetics.education.meetr_spring.service.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;

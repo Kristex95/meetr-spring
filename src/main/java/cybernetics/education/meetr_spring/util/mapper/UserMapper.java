@@ -1,7 +1,7 @@
 package cybernetics.education.meetr_spring.util.mapper;
 
-import cybernetics.education.meetr_spring.dto.UserBaseDto;
-import cybernetics.education.meetr_spring.dto.UserDto;
+import cybernetics.education.meetr_spring.dto.User.UserBaseDto;
+import cybernetics.education.meetr_spring.dto.User.UserDto;
 import cybernetics.education.meetr_spring.model.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -10,7 +10,7 @@ import org.mapstruct.factory.Mappers;
 public interface UserMapper {
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
-    User fromDro(UserBaseDto dto);
+    User fromDto(UserBaseDto dto);
 
     UserBaseDto toBaseDto(User user);
 

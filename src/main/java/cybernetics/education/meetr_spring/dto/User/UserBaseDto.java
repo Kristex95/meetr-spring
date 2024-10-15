@@ -1,4 +1,4 @@
-package cybernetics.education.meetr_spring.dto;
+package cybernetics.education.meetr_spring.dto.User;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

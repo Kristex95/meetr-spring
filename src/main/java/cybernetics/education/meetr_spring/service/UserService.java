@@ -1,24 +1,22 @@
 package cybernetics.education.meetr_spring.service;
 
-import cybernetics.education.meetr_spring.dto.UserBaseDto;
-import cybernetics.education.meetr_spring.dto.UserDto;
+import cybernetics.education.meetr_spring.dto.User.UserBaseDto;
+import cybernetics.education.meetr_spring.dto.User.UserDto;
 import cybernetics.education.meetr_spring.model.User;
 import cybernetics.education.meetr_spring.repository.UserRepository;
 import cybernetics.education.meetr_spring.util.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
-	private UserRepository userRepository;
-	private PasswordEncoder passwordEncoder;
+	private final UserRepository userRepository;
+	private final PasswordEncoder passwordEncoder;
 
 	public List<UserDto> getAllUsers() {
 		return userRepository.findAll()
@@ -45,7 +43,7 @@ public class UserService {
 	}
 
 	public UserDto createUser(UserBaseDto userDto) {
-		final User user = userRepository.save(UserMapper.INSTANCE.fromDro(userDto));
+		final User user = userRepository.save(UserMapper.INSTANCE.fromDto(userDto));
 		return UserMapper.INSTANCE.toDto(user);
 	}
 
