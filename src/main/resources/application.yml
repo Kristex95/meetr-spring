@@ -1,19 +1,21 @@
-spring:
-  profiles:
-    active: dev  # Optional: Activate the dev profile by default, if desired
 server:
   port: 8090
----
 spring:
-  config:
-    activate:
-      on-profile: dev # This section will only be loaded when the 'dev' profile is active
+  liquibase:
+    enabled: true
+    change-log: db/changelog/db.changelog-master.yaml
+#  profiles:
+#    active: dev  # Optional: Activate the dev profile by default, if desired
+#  config:
+#    activate:
+#      on-profile: dev # This section will only be loaded when the 'dev' profile is active
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
   jpa:
-    hibernate:
-      ddl-auto: update  # Use 'update', 'create', or 'none' as needed
-    show-sql: true  # Optional: Enables SQL logging for debugging
+#    hibernate:
+#      ddl-auto: update  # Use 'update', 'create', or 'none' as needed
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+#    show-sql: true  # Optional: Enables SQL logging for debugging

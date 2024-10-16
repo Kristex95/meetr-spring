@@ -1,0 +1,71 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1729114784508-1
+      author: anika (generated)
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: messagesPK
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: content
+                  type: TEXT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: createdAt
+                  type: TIMESTAMP(6) WITHOUT TIME ZONE
+              - column:
+                  name: updatedAt
+                  type: TIMESTAMP(6) WITHOUT TIME ZONE
+              - column:
+                  constraints:
+                    nullable: false
+                  name: sender_id
+                  type: BIGINT
+            tableName: messages
+  - changeSet:
+      id: 1729114784508-2
+      author: anika (generated)
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: usersPK
+                  name: id
+                  type: BIGINT
+              - column:
+                  name: email
+                  type: VARCHAR(255)
+              - column:
+                  name: password
+                  type: VARCHAR(255)
+              - column:
+                  name: username
+                  type: VARCHAR(255)
+            tableName: users
+  - changeSet:
+      id: 1729114784508-3
+      author: anika (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: sender_id
+            baseTableName: messages
+            constraintName: FK4ui4nnwntodh6wjvck53dbk9m
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: users
+            validate: true
