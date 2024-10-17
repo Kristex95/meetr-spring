@@ -1,7 +1,24 @@
 databaseChangeLog:
   - changeSet:
-      id: 1729114784508-1
-      author: anika (generated)
+      id: 1729205541475-1
+      author: Kristex (generated)
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                  name: chat_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: user_id
+                  type: BIGINT
+            tableName: chat_users
+  - changeSet:
+      id: 1729205541475-2
+      author: Kristex (generated)
       changes:
         - createTable:
             columns:
@@ -10,62 +27,103 @@ databaseChangeLog:
                   constraints:
                     nullable: false
                     primaryKey: true
-                    primaryKeyName: messagesPK
+                    primaryKeyName: chatsPK
                   name: id
                   type: BIGINT
               - column:
                   constraints:
                     nullable: false
-                  name: content
-                  type: TEXT
+                  name: created_at
+                  type: TIMESTAMP(6) WITHOUT TIME ZONE
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP(6) WITHOUT TIME ZONE
+            tableName: chats
+  - changeSet:
+      id: 1729205541475-3
+      author: Kristex (generated)
+      changes:
+        - addColumn:
+            columns:
               - column:
                   constraints:
                     nullable: false
-                  name: createdAt
-                  type: TIMESTAMP(6) WITHOUT TIME ZONE
-              - column:
-                  name: updatedAt
-                  type: TIMESTAMP(6) WITHOUT TIME ZONE
-              - column:
-                  constraints:
-                    nullable: false
-                  name: sender_id
-                  type: BIGINT
+                  name: chat_id
+                  type: bigint
             tableName: messages
   - changeSet:
-      id: 1729114784508-2
-      author: anika (generated)
+      id: 1729205541475-4
+      author: Kristex (generated)
       changes:
-        - createTable:
+        - addColumn:
             columns:
               - column:
-                  autoIncrement: true
                   constraints:
                     nullable: false
-                    primaryKey: true
-                    primaryKeyName: usersPK
-                  name: id
-                  type: BIGINT
-              - column:
-                  name: email
-                  type: VARCHAR(255)
-              - column:
-                  name: password
-                  type: VARCHAR(255)
-              - column:
-                  name: username
-                  type: VARCHAR(255)
-            tableName: users
+                  name: created_at
+                  type: timestamp(6)
+            tableName: messages
   - changeSet:
-      id: 1729114784508-3
-      author: anika (generated)
+      id: 1729205541475-5
+      author: Kristex (generated)
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  name: updated_at
+                  type: timestamp(6)
+            tableName: messages
+  - changeSet:
+      id: 1729205541475-6
+      author: Kristex (generated)
       changes:
         - addForeignKeyConstraint:
-            baseColumnNames: sender_id
+            baseColumnNames: chat_id
             baseTableName: messages
-            constraintName: FK4ui4nnwntodh6wjvck53dbk9m
+            constraintName: FK64w44ngcpqp99ptcb9werdfmb
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: chats
+            validate: true
+  - changeSet:
+      id: 1729205541475-7
+      author: Kristex (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: chat_users
+            constraintName: FKbbuxrxc67blnxsexqdlfmrpbh
             deferrable: false
             initiallyDeferred: false
             referencedColumnNames: id
             referencedTableName: users
             validate: true
+  - changeSet:
+      id: 1729205541475-8
+      author: Kristex (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: chat_id
+            baseTableName: chat_users
+            constraintName: FKlblrwneuhods5qvh9od8yyewy
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: chats
+            validate: true
+  - changeSet:
+      id: 1729205541475-9
+      author: Kristex (generated)
+      changes:
+        - dropColumn:
+            columnName: createdAt
+            tableName: messages
+  - changeSet:
+      id: 1729205541475-10
+      author: Kristex (generated)
+      changes:
+        - dropColumn:
+            columnName: updatedAt
+            tableName: messages
+

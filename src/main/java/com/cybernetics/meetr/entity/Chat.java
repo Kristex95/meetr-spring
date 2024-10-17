@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -11,23 +12,23 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "messages")
-public class Message {
+@Table(name = "chats")
+public class Chat {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@ManyToOne
-	@JoinColumn(name = "chat_id", nullable = false)
-	private Chat chat;
+	@ManyToMany
+	@JoinTable(
+			name = "chat_users",
+			joinColumns = @JoinColumn(name = "chat_id"),
+			inverseJoinColumns = @JoinColumn(name = "user_id")
+	)
+	private List<User> participants;
 
-	@ManyToOne
-	@JoinColumn(name = "sender_id", nullable = false)
-	private User sender;
-
-	@Column(nullable = false, columnDefinition = "TEXT")
-	private String content;
+	@OneToMany(mappedBy = "chat", cascade = CascadeType.ALL)
+	private List<Message> messages;
 
 	@Column(nullable = false)
 	private LocalDateTime createdAt;
