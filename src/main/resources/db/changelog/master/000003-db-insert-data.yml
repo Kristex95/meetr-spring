@@ -1,0 +1,29 @@
+databaseChangeLog:
+  - changeSet:
+      id: "000003-db-insert-data"
+      author: "Kristex"
+      changes:
+        - insert:
+            tableName: "users"
+            columns:
+              - column:
+                  name: "email"
+                  value: "test1@test.mail"
+              - column:
+                  name: "password"
+                  value: "hashedpassword1"
+              - column:
+                  name: "username"
+                  value: "User1"
+        - insert:
+            tableName: "users"
+            columns:
+              - column:
+                  name: "email"
+                  value: "test2@test.mail"
+              - column:
+                  name: "password"
+                  value: "hashedpassword2"
+              - column:
+                  name: "username"
+                  value: "User2"
