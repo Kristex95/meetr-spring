@@ -1,4 +1,4 @@
-package com.cybernetics.meetr.dto.Message;
+package com.cybernetics.meetr.dto.message;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,9 +12,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @SuperBuilder
 public class MessageBaseDto {
-	private String content;
 	private Long senderId;
-//	private Long chatId;
+	private Long chatId;
+	private String content;
 	private LocalDateTime createdAt;
 	private LocalDateTime updatedAt;
 }

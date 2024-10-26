@@ -1,7 +1,7 @@
 package com.cybernetics.meetr.service;
 
-import com.cybernetics.meetr.dto.User.UserBaseDto;
-import com.cybernetics.meetr.dto.User.UserDto;
+import com.cybernetics.meetr.dto.user.UserBaseDto;
+import com.cybernetics.meetr.dto.user.UserDto;
 import com.cybernetics.meetr.entity.User;
 import com.cybernetics.meetr.repository.UserRepository;
 import com.cybernetics.meetr.util.mapper.UserMapper;
@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -43,7 +44,8 @@ public class UserService {
 	}
 
 	public UserDto createUser(UserBaseDto userDto) {
-		final User user = userRepository.save(UserMapper.INSTANCE.fromDto(userDto));
+		final User newUser = UserMapper.INSTANCE.fromDto(userDto);
+		final User user = userRepository.save(newUser);
 		return UserMapper.INSTANCE.toDto(user);
 	}
 

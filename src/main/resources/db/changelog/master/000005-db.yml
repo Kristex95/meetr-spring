@@ -1,0 +1,46 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1729975065060-1
+      author: Kristex (generated)
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                  name: created_at
+                  type: timestamp(6)
+            tableName: chats
+  - changeSet:
+      id: 1729975065060-2
+      author: Kristex (generated)
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                  name: created_at
+                  type: timestamp(6)
+            tableName: users
+  - changeSet:
+      id: 1729975065060-3
+      author: Kristex (generated)
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  name: updated_at
+                  type: timestamp(6)
+            tableName: chats
+  - changeSet:
+      id: 1729975065060-4
+      author: Kristex (generated)
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  name: updated_at
+                  type: timestamp(6)
+            tableName: users
+

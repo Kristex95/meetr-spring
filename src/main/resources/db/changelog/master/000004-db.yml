@@ -1,0 +1,26 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1729970274531-1
+      author: Kristex (generated)
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                  name: event_id
+                  type: bigint
+            tableName: chats
+  - changeSet:
+      id: 1729970274531-2
+      author: Kristex (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: event_id
+            baseTableName: chats
+            constraintName: FKeop5bdbqhehvh7fjxfnhualil
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: events
+            validate: true

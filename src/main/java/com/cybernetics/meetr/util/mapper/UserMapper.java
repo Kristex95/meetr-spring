@@ -1,7 +1,7 @@
 package com.cybernetics.meetr.util.mapper;
 
-import com.cybernetics.meetr.dto.User.UserBaseDto;
-import com.cybernetics.meetr.dto.User.UserDto;
+import com.cybernetics.meetr.dto.user.UserBaseDto;
+import com.cybernetics.meetr.dto.user.UserDto;
 import com.cybernetics.meetr.entity.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;

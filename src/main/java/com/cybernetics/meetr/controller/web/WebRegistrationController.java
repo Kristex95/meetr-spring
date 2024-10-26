@@ -1,6 +1,6 @@
 package com.cybernetics.meetr.controller.web;
 
-import com.cybernetics.meetr.dto.User.UserDto;
+import com.cybernetics.meetr.dto.user.UserDto;
 import com.cybernetics.meetr.dto.request.RegistrationRequest;
 import com.cybernetics.meetr.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,7 +1,7 @@
 package com.cybernetics.meetr.controller;
 
-import com.cybernetics.meetr.dto.User.UserBaseDto;
-import com.cybernetics.meetr.dto.User.UserDto;
+import com.cybernetics.meetr.dto.user.UserBaseDto;
+import com.cybernetics.meetr.dto.user.UserDto;
 import com.cybernetics.meetr.dto.response.Response;
 import com.cybernetics.meetr.service.UserService;
 import lombok.RequiredArgsConstructor;

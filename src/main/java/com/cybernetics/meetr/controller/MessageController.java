@@ -1,6 +1,6 @@
 package com.cybernetics.meetr.controller;
 
-import com.cybernetics.meetr.dto.Message.MessageDto;
+import com.cybernetics.meetr.dto.message.MessageDto;
 import com.cybernetics.meetr.dto.response.Response;
 import com.cybernetics.meetr.service.MessageService;
 import lombok.RequiredArgsConstructor;

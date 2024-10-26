@@ -1,4 +1,4 @@
-package com.cybernetics.meetr.dto.User;
+package com.cybernetics.meetr.dto.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1729975519373-1
+      author: Kristex (generated)
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  name: start_date_time
+                  type: timestamp(6)
+            tableName: events

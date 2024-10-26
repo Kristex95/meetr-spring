@@ -1,0 +1,82 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1729963189860-3
+      author: Kristex (generated)
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableName: event_users
+            constraintName: FK12j8a4cp4t3tqdb4obgogx6hm
+  - changeSet:
+      id: 1729963189860-1
+      author: Kristex (generated)
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                  name: event_id
+                  type: bigint
+            tableName: event_users
+  - changeSet:
+      id: 1729963189860-2
+      author: Kristex (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: event_id
+            baseTableName: event_users
+            constraintName: FKci0b9ys3awpour3lsn05dq8r4
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: events
+            validate: true
+  - changeSet:
+      id: 1729963189860-4
+      author: Kristex (generated)
+      changes:
+        - dropColumn:
+            columnName: chat_id
+            tableName: event_users
+
+databaseChangeLog:
+  - changeSet:
+      id: 1729963261866-3
+      author: Kristex (generated)
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableName: event_users
+            constraintName: FK12j8a4cp4t3tqdb4obgogx6hm
+  - changeSet:
+      id: 1729963261866-1
+      author: Kristex (generated)
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                  name: event_id
+                  type: bigint
+            tableName: event_users
+  - changeSet:
+      id: 1729963261866-2
+      author: Kristex (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: event_id
+            baseTableName: event_users
+            constraintName: FKci0b9ys3awpour3lsn05dq8r4
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: events
+            validate: true
+  - changeSet:
+      id: 1729963261866-4
+      author: Kristex (generated)
+      changes:
+        - dropColumn:
+            columnName: chat_id
+            tableName: event_users
+

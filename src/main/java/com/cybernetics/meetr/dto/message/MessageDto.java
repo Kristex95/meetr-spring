@@ -1,4 +1,4 @@
-package com.cybernetics.meetr.dto.User;
+package com.cybernetics.meetr.dto.message;
 
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -8,6 +8,6 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDto extends UserBaseDto {
-    private Long id;
+public class MessageDto extends MessageBaseDto {
+	private Long id;
 }

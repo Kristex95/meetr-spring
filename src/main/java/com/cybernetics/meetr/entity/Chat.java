@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @Setter
@@ -19,20 +18,22 @@ public class Chat {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@ManyToMany
-	@JoinTable(
-			name = "chat_users",
-			joinColumns = @JoinColumn(name = "chat_id"),
-			inverseJoinColumns = @JoinColumn(name = "user_id")
-	)
-	private List<User> participants;
-
-	@OneToMany(mappedBy = "chat", cascade = CascadeType.ALL)
-	private List<Message> messages;
+	@ManyToOne
+	@JoinColumn(name = "event_id", nullable = false)
+	private Event event;
 
 	@Column(nullable = false)
 	private LocalDateTime createdAt;
 
-	@Column(nullable = true)
 	private LocalDateTime updatedAt;
+
+	@PrePersist
+	protected void onCreate() {
+		this.createdAt = LocalDateTime.now();
+	}
+
+	@PreUpdate
+	protected void onUpdate() {
+		this.updatedAt = LocalDateTime.now();
+	}
 }
