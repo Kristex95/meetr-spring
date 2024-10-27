@@ -30,6 +30,9 @@ public class Event {
 
 	private LocalDateTime startDateTime;
 
+	@OneToMany(mappedBy = "event", cascade = CascadeType.REMOVE, orphanRemoval = true)
+	private List<Chat> chats;
+
 	@ManyToMany
 	@JoinTable(
 			name = "event_users",

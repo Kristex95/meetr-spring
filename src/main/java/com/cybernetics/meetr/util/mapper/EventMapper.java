@@ -14,8 +14,8 @@ public interface EventMapper {
 	@Mapping(source = "creatorId", target = "creator.id")
 	Event fromDto(EventBaseDto dto);
 
-	EventBaseDto toBaseDto(Event message);
+	EventBaseDto toBaseDto(Event event);
 
 	@Mapping(source = "creator.id", target = "creatorId")
-	EventDto toDto(Event message);
+	EventDto toDto(Event event);
 }

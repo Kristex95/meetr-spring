@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 public enum WsType {
-	SUBSCRIBE("subscribe"), UNSUBSCRIBE("unsubscribe");
+	SUBSCRIBE("subscribe"), UNSUBSCRIBE("unsubscribe"), SEND("send");
 
 	@JsonValue
 	private final String name;

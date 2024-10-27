@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -21,6 +22,9 @@ public class Chat {
 	@ManyToOne
 	@JoinColumn(name = "event_id", nullable = false)
 	private Event event;
+
+	@OneToMany(mappedBy = "chat", cascade = CascadeType.REMOVE, orphanRemoval = true)
+	private List<Message> messages;
 
 	@Column(nullable = false)
 	private LocalDateTime createdAt;

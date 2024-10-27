@@ -16,7 +16,7 @@ public class WebRegistrationController {
 	@Autowired
 	private UserService userService;
 
-	@GetMapping("/register")
+	@GetMapping("web/register")
 	public String showRegistrationForm(Model model) {
 		model.addAttribute("registrationRequest", new RegistrationRequest());
 		return "register"; // Return Thymeleaf registration page
@@ -24,7 +24,7 @@ public class WebRegistrationController {
 
 	@PostMapping("/api/register")
 	public String registerUser(RegistrationRequest request, RedirectAttributes redirectAttributes) {
-		UserDto user = userService.registerUser(request.getUsername(), request.getEmail(), request.getPassword());
+		UserDto user = userService.registerUser(request);
 		redirectAttributes.addFlashAttribute("username", user.getUsername());
 		// Redirect to the main page (use the appropriate mapping for your main page)
 		return "redirect:/main";

@@ -19,7 +19,7 @@ public class WebLoginController {
 		this.passwordEncoder = passwordEncoder;
 	}
 
-	@GetMapping("/login")
+	@GetMapping("web/login")
 	public String showLoginForm() {
 		return "login";  // Return the login page view
 	}

@@ -1,6 +1,7 @@
 package com.cybernetics.meetr.service;
 
 import com.cybernetics.meetr.dto.event.EventBaseDto;
+import com.cybernetics.meetr.dto.event.EventDto;
 import com.cybernetics.meetr.dto.request.event.CreateEventRequest;
 import com.cybernetics.meetr.entity.Chat;
 import com.cybernetics.meetr.entity.Event;
@@ -24,26 +25,34 @@ public class EventService {
 	private final UserRepository userRepository;
 	private final ChatRepository chatRepository;
 
-	public void createEvent(CreateEventRequest createEventRequest) {
-		final LocalDateTime timeNow = LocalDateTime.now();
+	public Event getById(Long id) {
+		return eventRepository.findById(id)
+				.orElseThrow(() -> new RuntimeException(String.format("Cant find event with id: %s", id)));
+	}
 
+	public Event getByCreatorId(Long id) {
+		return eventRepository.findByCreatorId(id);
+	}
+
+	public EventDto getEvent(Long id) {
+		return EventMapper.INSTANCE.toDto(getById(id));
+	}
+
+	public void createEvent(CreateEventRequest createEventRequest) {
 		final User user = userRepository.findById(createEventRequest.getCreatorId()).orElseThrow();
 
 		final EventBaseDto newEvent = EventBaseDto.builder()
 				.name(createEventRequest.getName())
 				.description(createEventRequest.getDescription())
 				.creatorId(createEventRequest.getCreatorId())
-				.createdAt(timeNow)
 				.participants(List.of(UserMapper.INSTANCE.toDto(user)))
 				.build();
-		final Event event = EventMapper.INSTANCE.fromDto(newEvent);
+		Event event = EventMapper.INSTANCE.fromDto(newEvent);
+		event = eventRepository.save(event);
 
 		final Chat chat = Chat.builder()
 				.event(event)
-				.createdAt(timeNow)
 				.build();
-
-		eventRepository.save(event);
 		chatRepository.save(chat);
 	}
 
@@ -66,5 +75,11 @@ public class EventService {
 				.findById(id)
 				.orElseThrow();
 		eventRepository.delete(requestedEvent);
+	}
+
+	public List<EventDto> getAllEvents() {
+		return eventRepository.findAll()
+				.stream().map(EventMapper.INSTANCE::toDto)
+				.toList();
 	}
 }

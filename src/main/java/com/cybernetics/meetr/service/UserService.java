@@ -1,5 +1,6 @@
 package com.cybernetics.meetr.service;
 
+import com.cybernetics.meetr.dto.request.RegistrationRequest;
 import com.cybernetics.meetr.dto.user.UserBaseDto;
 import com.cybernetics.meetr.dto.user.UserDto;
 import com.cybernetics.meetr.entity.User;
@@ -9,8 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
+
+import static com.cybernetics.meetr.util.jwt.JwtUtil.extractUsername;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +35,11 @@ public class UserService {
 	public User getByEmail(String email) {
 		return userRepository.findByEmail(email)
 				.orElseThrow(() -> new RuntimeException(String.format("Cant find user with email: %s", email)));
+	}
+
+	public User getByUsername(String username) {
+		return userRepository.findByUsername(username)
+				.orElseThrow(() -> new RuntimeException(String.format("Cant find user with username: %s", username)));
 	}
 
 	public UserDto getUser(Long id) {
@@ -60,8 +67,17 @@ public class UserService {
 		userRepository.deleteById(id);
 	}
 
-	public UserDto registerUser(String username, String email, String password) {
-		final User user = User.builder().username(username).email(email).password(passwordEncoder.encode(password)).build();
+	public UserDto registerUser(RegistrationRequest registrationRequest) {
+		final User user = User.builder()
+				.username(registrationRequest.getUsername())
+				.email(registrationRequest.getEmail())
+				.password(passwordEncoder.encode(registrationRequest.getPassword()))
+				.build();
 		return UserMapper.INSTANCE.toDto(userRepository.save(user));
+	}
+
+	public User getUserDetailsFromToken(String jwtToken) {
+		final String username = extractUsername(jwtToken);
+		return getByUsername(username);
 	}
 }

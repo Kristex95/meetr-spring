@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 @Controller
 public class WebMainController {
 
-	@GetMapping("/main")
+	@GetMapping("web/main")
 	public String mainPage(@ModelAttribute("username") String username, Model model) {
 		// The username will automatically be available via the Model from the redirect
 		model.addAttribute("username", username);

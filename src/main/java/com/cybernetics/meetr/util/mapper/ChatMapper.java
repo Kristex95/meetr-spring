@@ -11,10 +11,11 @@ import org.mapstruct.factory.Mappers;
 public interface ChatMapper {
 	ChatMapper INSTANCE = Mappers.getMapper(ChatMapper.class);
 
+	@Mapping(source = "eventId", target = "event.id")//todo not mapping eventId
 	Chat fromDto(ChatBaseDto dto);
 
-	ChatBaseDto toBaseDto(Chat message);
+	ChatBaseDto toBaseDto(Chat chat);
 
 	@Mapping(source = "event.id", target = "eventId")
-	ChatDto toDto(Chat message);
+	ChatDto toDto(Chat chat);
 }
