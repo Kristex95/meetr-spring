@@ -6,10 +6,7 @@ import com.cybernetics.meetr.dto.response.Response;
 import com.cybernetics.meetr.service.ChatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -28,5 +25,11 @@ public class ChatController {
 	@GetMapping("/{id}/messages")
 	public ResponseEntity<Response<List<MessageDto>>> getChatMessages(@PathVariable Long id) {
 		return ResponseEntity.ok(Response.body(chatService.getChatMessages(id)));
+	}
+
+	@DeleteMapping("{id}/users/{userId}")
+	public ResponseEntity<Response<Void>> removeUser(Long id, Long userId) {
+		chatService.removeUser(id, userId);
+		return ResponseEntity.ok(Response.message("Removed user from group"));
 	}
 }

@@ -3,8 +3,10 @@ package com.cybernetics.meetr.service;
 import com.cybernetics.meetr.dto.chat.ChatDto;
 import com.cybernetics.meetr.dto.event.EventDto;
 import com.cybernetics.meetr.dto.request.RegistrationRequest;
+import com.cybernetics.meetr.dto.request.FriendsPaginatedRequest;
 import com.cybernetics.meetr.dto.user.UserBaseDto;
 import com.cybernetics.meetr.dto.user.UserDto;
+import com.cybernetics.meetr.entity.Event;
 import com.cybernetics.meetr.entity.User;
 import com.cybernetics.meetr.repository.ChatRepository;
 import com.cybernetics.meetr.repository.EventRepository;
@@ -12,7 +14,13 @@ import com.cybernetics.meetr.repository.UserRepository;
 import com.cybernetics.meetr.util.mapper.ChatMapper;
 import com.cybernetics.meetr.util.mapper.EventMapper;
 import com.cybernetics.meetr.util.mapper.UserMapper;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +38,31 @@ public class UserService {
 	private final EventRepository eventRepository;
 	private final PasswordEncoder passwordEncoder;
 
+	public Page<UserDto> getFriends(FriendsPaginatedRequest paginatedRequest) {
+		final Specification<User> spec = (root, query, criteriaBuilder) -> {
+			final Join<User, User> friendsJoin = root.join("friends");
+
+			final Predicate isFriendOfUser = criteriaBuilder.equal(friendsJoin.get("id"), paginatedRequest.getUserId());
+			final Predicate searchPredicate = criteriaBuilder.or(
+					criteriaBuilder.like(criteriaBuilder.lower(root.get("username")), "%" + paginatedRequest.getSearch().toLowerCase() + "%"),
+					criteriaBuilder.like(criteriaBuilder.lower(root.get("email")), "%" + paginatedRequest.getSearch().toLowerCase() + "%")
+			);
+
+			// Combine both predicates
+			return criteriaBuilder.and(isFriendOfUser, searchPredicate);
+		};
+
+		final PageRequest pageable = PageRequest.of(
+				paginatedRequest.getPage(),
+				paginatedRequest.getSize(),
+				Sort.Direction.ASC,
+				"id");
+
+		final Page<User> events = userRepository.findAll(pageable);
+        return events.map(UserMapper.INSTANCE::toDto);
+	}
+
+	//TODO list friends
 	public List<UserDto> getAllUsers() {
 		return userRepository.findAll()
 				.stream().map(UserMapper.INSTANCE::toDto)
@@ -65,6 +98,7 @@ public class UserService {
 		return UserMapper.INSTANCE.toDto(user);
 	}
 
+	//TODO finish
 	public UserDto updateUser(Long id, UserBaseDto userDetails) {
 		final User user = getById(id);
 		user.setUsername(userDetails.getUsername());

@@ -2,6 +2,7 @@ package com.cybernetics.meetr.controller;
 
 import com.cybernetics.meetr.dto.chat.ChatDto;
 import com.cybernetics.meetr.dto.event.EventDto;
+import com.cybernetics.meetr.dto.request.EventsPaginatedRequest;
 import com.cybernetics.meetr.dto.request.event.CreateEventRequest;
 import com.cybernetics.meetr.dto.response.Response;
 import com.cybernetics.meetr.dto.user.UserDto;
@@ -14,6 +15,7 @@ import com.cybernetics.meetr.util.mapper.ChatMapper;
 import com.cybernetics.meetr.util.mapper.EventMapper;
 import com.cybernetics.meetr.util.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -30,6 +32,12 @@ public class EventController {
 
 	private final EventService eventService;
 
+	@GetMapping("/paginated")
+	public ResponseEntity<Response<Page<EventDto>>> getEventsPaginated(EventsPaginatedRequest request) {
+		return ResponseEntity.ok(Response.body(eventService.getEventsPaginated(request)));
+	}
+
+	@Deprecated
 	@GetMapping
 	public ResponseEntity<Response<List<EventDto>>> getAllEvents() {
 		return ResponseEntity.ok(Response.body(eventService.getAllEvents()));
@@ -88,5 +96,11 @@ public class EventController {
 		catch (Exception ex) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 		}
+	}
+
+	@DeleteMapping("{id}/users/{userId}")
+	public ResponseEntity<Response<Void>> removeUser(Long id, Long userId) {
+		eventService.removeUser(id, userId);
+		return ResponseEntity.ok(Response.message("Removed user from group"));
 	}
 }

@@ -5,7 +5,9 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -26,6 +28,15 @@ public class User {
 
 	private String password;
 
+	@ManyToMany
+	@JoinTable(
+			name = "user_friends",
+			joinColumns = @JoinColumn(name = "user_id"),
+			inverseJoinColumns = @JoinColumn(name = "friend_id")
+	)
+	private Set<User> friends = new HashSet<>();
+
+	//TODO remake with many to many
 	@ElementCollection
 	@CollectionTable(
 			name = "event_users",

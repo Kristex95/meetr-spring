@@ -2,6 +2,7 @@ package com.cybernetics.meetr.service;
 
 import com.cybernetics.meetr.dto.event.EventBaseDto;
 import com.cybernetics.meetr.dto.event.EventDto;
+import com.cybernetics.meetr.dto.request.EventsPaginatedRequest;
 import com.cybernetics.meetr.dto.request.event.CreateEventRequest;
 import com.cybernetics.meetr.dto.user.UserDto;
 import com.cybernetics.meetr.entity.Chat;
@@ -12,8 +13,15 @@ import com.cybernetics.meetr.repository.EventRepository;
 import com.cybernetics.meetr.repository.UserRepository;
 import com.cybernetics.meetr.util.mapper.EventMapper;
 import com.cybernetics.meetr.util.mapper.UserMapper;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -24,77 +32,99 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class EventService {
-	private final EventRepository eventRepository;
-	private final UserRepository userRepository;
-	private final ChatRepository chatRepository;
+    private final EventRepository eventRepository;
+    private final UserService userService;
+    private final UserRepository userRepository;
+    //TODO refactor!!! reuse service instead
+    private final ChatRepository chatRepository;
 
-	public Event getById(Long id) {
-		return eventRepository.findById(id)
-				.orElseThrow(() -> new RuntimeException(String.format("Cant find event with id: %s", id)));
-	}
+    public Event getById(Long id) {
+        return eventRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException(String.format("Cant find event with id: %s", id)));
+    }
 
-	public Event getByCreatorId(Long id) {
-		return eventRepository.findByCreatorId(id);
-	}
+    public Event getByCreatorId(Long id) {
+        return eventRepository.findByCreatorId(id);
+    }
 
-	public List<User> getEventUsers(Long id) {
-		final Event event = getById(id);
-		return event.getParticipants();
-	}
+    public Page<EventDto> getEventsPaginated(EventsPaginatedRequest paginatedRequest) {
+        final PageRequest pageable = PageRequest.of(
+                paginatedRequest.getPage(),
+                paginatedRequest.getSize(),
+                Sort.Direction.ASC,
+				"id");
 
-	public void createEvent(CreateEventRequest createEventRequest) {
-		final User user = userRepository.findById(createEventRequest.getCreatorId()).orElseThrow();
+        final Page<Event> events = eventRepository.findAll(pageable);
+        return events.map(EventMapper.INSTANCE::toDto);
+    }
 
-		final EventBaseDto newEvent = EventBaseDto.builder()
-				.name(createEventRequest.getName())
-				.description(createEventRequest.getDescription())
-				.creatorId(createEventRequest.getCreatorId())
-				.participants(List.of(UserMapper.INSTANCE.toDto(user)))
-				.build();
-		Event event = EventMapper.INSTANCE.fromDto(newEvent);
-		event = eventRepository.save(event);
+    public List<User> getEventUsers(Long id) {
+        final Event event = getById(id);
+        return event.getParticipants();
+    }
 
-		final Chat chat = Chat.builder()
-				.event(event)
-				.users(List.of(user))
-				.build();
-		chatRepository.save(chat);
-	}
+    public void createEvent(CreateEventRequest createEventRequest) {
+        final User user = userService.getById(createEventRequest.getCreatorId());
 
-	@Transactional
-	public void addUserToEvent(Long chatId, Long userId) {
-		Event event = eventRepository.findById(chatId)
-				.orElseThrow(() -> new RuntimeException("Event not found"));
+        final EventBaseDto newEvent = EventBaseDto.builder()
+                .name(createEventRequest.getName())
+                .description(createEventRequest.getDescription())
+                .creatorId(createEventRequest.getCreatorId())
+                .participants(List.of(UserMapper.INSTANCE.toDto(user)))
+                .build();
+        Event event = EventMapper.INSTANCE.fromDto(newEvent);
+        event = eventRepository.save(event);
 
-		User user = userRepository.findById(userId)
-				.orElseThrow(() -> new RuntimeException("User not found"));
+        final Chat chat = Chat.builder()
+                .event(event)
+                .users(List.of(user))
+                .build();
+        chatRepository.save(chat);
+    }
 
-		if (!event.getParticipants().contains(user)) {
-			event.getParticipants().add(user);
-			eventRepository.save(event);
-		}
-	}
+    @Transactional
+    public void addUserToEvent(Long chatId, Long userId) {
+        Event event = eventRepository.findById(chatId)
+                .orElseThrow(() -> new RuntimeException("Event not found"));
 
-	public void deleteEvent(Long id) {
-		final Event requestedEvent = eventRepository
-				.findById(id)
-				.orElseThrow();
-		eventRepository.delete(requestedEvent);
-	}
+        User user = userService.getById(userId);
 
-	public List<EventDto> getAllEvents() {
-		return eventRepository.findAll()
-				.stream().map(EventMapper.INSTANCE::toDto)
-				.toList();
-	}
+        if (!event.getParticipants().contains(user)) {
+            event.getParticipants().add(user);
+            eventRepository.save(event);
+        }
+    }
 
-	public Chat getMainChatByEventId(Long id) {
-		final List<Chat> chats = getAllChatsByEventId(id);
-		return chats.get(0);
-	}
+    public void removeUser(Long id, Long userId) {
+        final Event event = getById(id);
+        final User user = userService.getById(userId);
+        user.getChatIds().removeIf(chatId -> {
+            final Chat chat = chatRepository.findById(chatId).orElseThrow();
+            return chat.getEvent() == event;
+        });
+        userRepository.save(user);
+    }
 
-	public List<Chat> getAllChatsByEventId(Long id) {
-		final Event event = getById(id);
-		return event.getChats();
-	}
+    public void deleteEvent(Long id) {
+        final Event requestedEvent = eventRepository
+                .findById(id)
+                .orElseThrow();
+        eventRepository.delete(requestedEvent);
+    }
+
+    public List<EventDto> getAllEvents() {
+        return eventRepository.findAll()
+                .stream().map(EventMapper.INSTANCE::toDto)
+                .toList();
+    }
+
+    public Chat getMainChatByEventId(Long id) {
+        final List<Chat> chats = getAllChatsByEventId(id);
+        return chats.get(0);
+    }
+
+    public List<Chat> getAllChatsByEventId(Long id) {
+        final Event event = getById(id);
+        return event.getChats();
+    }
 }
