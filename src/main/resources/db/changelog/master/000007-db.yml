@@ -1,0 +1,18 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1729287307077-1
+      author: Kristex (generated)
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                  name: chat_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: user_id
+                  type: BIGINT
+            tableName: chat_users

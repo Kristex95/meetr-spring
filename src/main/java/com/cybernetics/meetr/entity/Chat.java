@@ -26,6 +26,14 @@ public class Chat {
 	@OneToMany(mappedBy = "chat", cascade = CascadeType.REMOVE, orphanRemoval = true)
 	private List<Message> messages;
 
+	@ManyToMany
+	@JoinTable(
+			name = "chat_users",
+			joinColumns = @JoinColumn(name = "chat_id"),
+			inverseJoinColumns = @JoinColumn(name = "user_id")
+	)
+	private List<User> users;
+
 	@Column(nullable = false)
 	private LocalDateTime createdAt;
 
@@ -39,5 +47,11 @@ public class Chat {
 	@PreUpdate
 	protected void onUpdate() {
 		this.updatedAt = LocalDateTime.now();
+	}
+
+	public void addUser(User user){
+		if(!users.contains(user)) {
+			users.add(user);
+		}
 	}
 }

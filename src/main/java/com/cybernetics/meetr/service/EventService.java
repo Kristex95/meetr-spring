@@ -3,6 +3,7 @@ package com.cybernetics.meetr.service;
 import com.cybernetics.meetr.dto.event.EventBaseDto;
 import com.cybernetics.meetr.dto.event.EventDto;
 import com.cybernetics.meetr.dto.request.event.CreateEventRequest;
+import com.cybernetics.meetr.dto.user.UserDto;
 import com.cybernetics.meetr.entity.Chat;
 import com.cybernetics.meetr.entity.Event;
 import com.cybernetics.meetr.entity.User;
@@ -16,6 +17,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -34,8 +37,9 @@ public class EventService {
 		return eventRepository.findByCreatorId(id);
 	}
 
-	public EventDto getEvent(Long id) {
-		return EventMapper.INSTANCE.toDto(getById(id));
+	public List<User> getEventUsers(Long id) {
+		final Event event = getById(id);
+		return event.getParticipants();
 	}
 
 	public void createEvent(CreateEventRequest createEventRequest) {
@@ -52,6 +56,7 @@ public class EventService {
 
 		final Chat chat = Chat.builder()
 				.event(event)
+				.users(List.of(user))
 				.build();
 		chatRepository.save(chat);
 	}
@@ -81,5 +86,15 @@ public class EventService {
 		return eventRepository.findAll()
 				.stream().map(EventMapper.INSTANCE::toDto)
 				.toList();
+	}
+
+	public Chat getMainChatByEventId(Long id) {
+		final List<Chat> chats = getAllChatsByEventId(id);
+		return chats.get(0);
+	}
+
+	public List<Chat> getAllChatsByEventId(Long id) {
+		final Event event = getById(id);
+		return event.getChats();
 	}
 }

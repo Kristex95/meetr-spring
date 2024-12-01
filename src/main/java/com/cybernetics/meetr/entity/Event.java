@@ -1,5 +1,6 @@
 package com.cybernetics.meetr.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -38,8 +39,7 @@ public class Event {
 			name = "event_users",
 			joinColumns = @JoinColumn(name = "event_id"),
 			inverseJoinColumns = @JoinColumn(name = "user_id")
-	)
-	private List<User> participants;
+	) private List<User> participants;
 
 	@Column(nullable = false)
 	private LocalDateTime createdAt;

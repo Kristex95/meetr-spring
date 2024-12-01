@@ -1,12 +1,18 @@
 package com.cybernetics.meetr.controller;
 
+import com.cybernetics.meetr.dto.chat.ChatDto;
 import com.cybernetics.meetr.dto.event.EventDto;
 import com.cybernetics.meetr.dto.request.event.CreateEventRequest;
 import com.cybernetics.meetr.dto.response.Response;
+import com.cybernetics.meetr.dto.user.UserDto;
+import com.cybernetics.meetr.entity.Chat;
 import com.cybernetics.meetr.entity.Event;
 import com.cybernetics.meetr.entity.User;
 import com.cybernetics.meetr.repository.EventRepository;
 import com.cybernetics.meetr.service.EventService;
+import com.cybernetics.meetr.util.mapper.ChatMapper;
+import com.cybernetics.meetr.util.mapper.EventMapper;
+import com.cybernetics.meetr.util.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,11 +37,30 @@ public class EventController {
 
 	@GetMapping("/{id}")
 	public ResponseEntity<Response<EventDto>> getEventById(@PathVariable Long id) {
-		return ResponseEntity.ok(Response.body(eventService.getEvent(id)));
+		return ResponseEntity.ok(Response.body(
+				EventMapper.INSTANCE.toDto(eventService.getById(id)))
+		);
+	}
+
+	@GetMapping("/{id}/users")
+	public ResponseEntity<Response<List<UserDto>>> getEventUsers(@PathVariable Long id) {
+		return ResponseEntity.ok(Response.body(
+				eventService.getEventUsers(id)
+						.stream()
+						.map(UserMapper.INSTANCE::toDto)
+						.toList()
+		));
+	}
+
+	@GetMapping("/{id}/mainChat")
+	public ResponseEntity<Response<ChatDto>> getEventMainChat(@PathVariable Long id) {
+		return ResponseEntity.ok(Response.body(ChatMapper.INSTANCE.toDto(
+				eventService.getMainChatByEventId(id))
+		));
 	}
 
 	//todo тестовый ендпоинт. должен принимать тело
-	@PostMapping("/{eventId}/users/{userId}")
+	@PostMapping("/{eventId}/adduser/{userId}")
 	public ResponseEntity<Void> addParticipantToEvent(@PathVariable Long eventId, @PathVariable Long userId) {
 		eventService.addUserToEvent(eventId, userId);
 		return ResponseEntity.status(HttpStatus.CREATED).build();

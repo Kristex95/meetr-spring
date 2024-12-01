@@ -40,7 +40,7 @@ public class WebSocketMessagingHandler extends TextWebSocketHandler {
 
 	@Override
 	protected void handleTextMessage(WebSocketSession session, TextMessage rawMessage) throws Exception {
-		User user = (User) session.getAttributes().get("user");
+		final User user = (User) session.getAttributes().get("user");
 		String payload = rawMessage.getPayload();
 		System.out.println("Message from user: " + user.getUsername() + " - " + payload);
 
@@ -68,6 +68,9 @@ public class WebSocketMessagingHandler extends TextWebSocketHandler {
 			final MessageBaseDto message = objectMapper.convertValue(data, MessageBaseDto.class);
 			saveMessage(message, user);
 			sendMessageToSubscribers(message);
+		} else if (type.equalsIgnoreCase(WsType.UNSUBSCRIBE.getName())) {
+			final Long chatId = data.get("chatId").asLong();
+			unsubscribeFromChat(chatId, session);
 		}
 	}
 
@@ -81,6 +84,18 @@ public class WebSocketMessagingHandler extends TextWebSocketHandler {
 		chatSubscriptions.putIfAbsent(chatId, new ArrayList<>());
 		chatSubscriptions.get(chatId).add(session); // Add the session to the list of subscribers
 		System.out.println("User subscribed to chatId: " + chatId);
+	}
+
+	private void unsubscribeFromChat(Long chatId, WebSocketSession session) {
+		List<WebSocketSession> subscribers = chatSubscriptions.get(chatId);
+		if (subscribers != null) {
+			subscribers.remove(session);
+			System.out.println("User unsubscribed from chatId: " + chatId);
+
+			if (subscribers.isEmpty()) {
+				chatSubscriptions.remove(chatId);
+			}
+		}
 	}
 
 	private void sendMessageToSubscribers(MessageBaseDto message) throws Exception {
