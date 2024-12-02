@@ -18,6 +18,7 @@ import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -63,21 +64,25 @@ public class EventService {
         return event.getParticipants();
     }
 
-    public void createEvent(CreateEventRequest createEventRequest) {
-        final User user = userService.getById(createEventRequest.getCreatorId());
+	@Transactional
+    public void createEvent(CreateEventRequest createEventRequest, User creator) {
+		Hibernate.initialize(creator.getChatIds());
+		final List<UserDto> participants = new ArrayList<>();
+		participants.add(UserMapper.INSTANCE.toDto(creator));
+		participants.addAll(createEventRequest.getParticipants());
 
         final EventBaseDto newEvent = EventBaseDto.builder()
                 .name(createEventRequest.getName())
                 .description(createEventRequest.getDescription())
-                .creatorId(createEventRequest.getCreatorId())
-                .participants(List.of(UserMapper.INSTANCE.toDto(user)))
+                .creatorId(creator.getId())
+                .participants(participants)
                 .build();
         Event event = EventMapper.INSTANCE.fromDto(newEvent);
         event = eventRepository.save(event);
 
         final Chat chat = Chat.builder()
                 .event(event)
-                .users(List.of(user))
+                .users(List.of(creator))
                 .build();
         chatRepository.save(chat);
     }

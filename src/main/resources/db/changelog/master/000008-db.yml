@@ -1,0 +1,75 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1733091788588-1
+      author: Kristex (generated)
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: user_friendsPK
+                  name: user_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: user_friendsPK
+                  name: friend_id
+                  type: BIGINT
+            tableName: user_friends
+  - changeSet:
+      id: 1733091788588-2
+      author: Kristex (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: friend_id
+            baseTableName: user_friends
+            constraintName: FK11y5boh1e7gh60rdqixyetv3x
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: users
+            validate: true
+  - changeSet:
+      id: 1733091788588-3
+      author: Kristex (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: chat_users
+            constraintName: FKbbuxrxc67blnxsexqdlfmrpbh
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: users
+            validate: true
+  - changeSet:
+      id: 1733091788588-4
+      author: Kristex (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: user_friends
+            constraintName: FKk08ugelrh9cea1oew3hgxryw2
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: users
+            validate: true
+  - changeSet:
+      id: 1733091788588-5
+      author: Kristex (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: chat_id
+            baseTableName: chat_users
+            constraintName: FKlblrwneuhods5qvh9od8yyewy
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: chats
+            validate: true
+

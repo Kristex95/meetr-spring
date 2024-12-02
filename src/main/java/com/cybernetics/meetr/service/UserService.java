@@ -99,8 +99,8 @@ public class UserService {
 	}
 
 	//TODO finish
-	public UserDto updateUser(Long id, UserBaseDto userDetails) {
-		final User user = getById(id);
+	public UserDto updateUser(UserBaseDto userDetails) {
+		final User user = getByUsername(userDetails.getUsername());
 		user.setUsername(userDetails.getUsername());
 		user.setEmail(userDetails.getEmail());
 		return UserMapper.INSTANCE.toDto(userRepository.save(user));

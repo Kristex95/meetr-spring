@@ -75,8 +75,8 @@ public class EventController {
 	}
 
 	@PostMapping
-	public ResponseEntity<Void> createEvent(@RequestBody CreateEventRequest createRequest) {
-		eventService.createEvent(createRequest);
+	public ResponseEntity<Void> createEvent(@RequestBody CreateEventRequest createRequest, @AuthenticationPrincipal User user) {
+		eventService.createEvent(createRequest, user);
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 
