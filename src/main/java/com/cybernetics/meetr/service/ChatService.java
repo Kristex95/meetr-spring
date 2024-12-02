@@ -13,6 +13,7 @@ import com.cybernetics.meetr.util.mapper.MessageMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -37,7 +38,10 @@ public class ChatService {
 	public List<MessageDto> getChatMessages(Long chatId) {
 		final Chat chat = getById(chatId);
 		final List<Message> messages = chat.getMessages();
-		return messages.stream().map(MessageMapper.INSTANCE::toDto).toList();
+		return messages.stream()
+				.sorted(Comparator.comparing(Message::getCreatedAt)) // Sort by createdAt
+				.map(MessageMapper.INSTANCE::toDto)
+				.toList();
 	}
 
 	//TODO need rework
