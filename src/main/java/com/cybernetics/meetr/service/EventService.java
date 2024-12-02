@@ -16,7 +16,6 @@ import com.cybernetics.meetr.util.mapper.UserMapper;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Hibernate;
 import org.springframework.data.domain.Page;
@@ -24,6 +23,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -65,27 +65,30 @@ public class EventService {
     }
 
 	@Transactional
-    public void createEvent(CreateEventRequest createEventRequest, User creator) {
-		Hibernate.initialize(creator.getChatIds());
+	public void createEvent(CreateEventRequest createEventRequest, Long creatorId) {
+		// Fetch the user within the transaction and initialize the collection
+		final User creator = userService.getById(creatorId);
+
 		final List<UserDto> participants = new ArrayList<>();
 		participants.add(UserMapper.INSTANCE.toDto(creator));
 		participants.addAll(createEventRequest.getParticipants());
 
-        final EventBaseDto newEvent = EventBaseDto.builder()
-                .name(createEventRequest.getName())
-                .description(createEventRequest.getDescription())
-                .creatorId(creator.getId())
-                .participants(participants)
-                .build();
-        Event event = EventMapper.INSTANCE.fromDto(newEvent);
-        event = eventRepository.save(event);
+		final EventBaseDto newEvent = EventBaseDto.builder()
+				.name(createEventRequest.getName())
+				.description(createEventRequest.getDescription())
+				.creatorId(creator.getId())
+				.participants(participants)
+				.build();
 
-        final Chat chat = Chat.builder()
-                .event(event)
-                .users(List.of(creator))
-                .build();
-        chatRepository.save(chat);
-    }
+		Event event = EventMapper.INSTANCE.fromDto(newEvent);
+		event = eventRepository.save(event);
+
+		final Chat chat = Chat.builder()
+				.event(event)
+				.users(List.of(creator))
+				.build();
+		chatRepository.save(chat);
+	}
 
     @Transactional
     public void addUserToEvent(Long chatId, Long userId) {
