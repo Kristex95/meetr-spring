@@ -6,7 +6,6 @@ import com.cybernetics.meetr.dto.request.RegistrationRequest;
 import com.cybernetics.meetr.dto.request.FriendsPaginatedRequest;
 import com.cybernetics.meetr.dto.user.UserBaseDto;
 import com.cybernetics.meetr.dto.user.UserDto;
-import com.cybernetics.meetr.entity.Event;
 import com.cybernetics.meetr.entity.User;
 import com.cybernetics.meetr.repository.ChatRepository;
 import com.cybernetics.meetr.repository.EventRepository;
@@ -19,13 +18,17 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static com.cybernetics.meetr.util.jwt.JwtUtil.extractUsername;
 
@@ -40,26 +43,48 @@ public class UserService {
 
 	public Page<UserDto> getFriends(FriendsPaginatedRequest paginatedRequest) {
 		final Specification<User> spec = (root, query, criteriaBuilder) -> {
+			// Join the 'friends' association of the User entity
 			final Join<User, User> friendsJoin = root.join("friends");
 
-			final Predicate isFriendOfUser = criteriaBuilder.equal(friendsJoin.get("id"), paginatedRequest.getUserId());
-			final Predicate searchPredicate = criteriaBuilder.or(
-					criteriaBuilder.like(criteriaBuilder.lower(root.get("username")), "%" + paginatedRequest.getSearch().toLowerCase() + "%"),
-					criteriaBuilder.like(criteriaBuilder.lower(root.get("email")), "%" + paginatedRequest.getSearch().toLowerCase() + "%")
-			);
+			// Define the condition that the user must be a friend of the specified user ID
 
-			// Combine both predicates
-			return criteriaBuilder.and(isFriendOfUser, searchPredicate);
+			// Create the base predicate that ensures the user is a friend of the specified user
+			Predicate combinedPredicate = criteriaBuilder.equal(friendsJoin.get("id"), paginatedRequest.getUserId());
+
+			// If search is provided, add the search predicate for username and email, case insensitive
+			if (paginatedRequest.getSearch() != null && !paginatedRequest.getSearch().isEmpty()) {
+				final String searchTerm = "%" + paginatedRequest.getSearch().toLowerCase() + "%";
+				final Predicate searchPredicate = criteriaBuilder.or(
+						criteriaBuilder.like(criteriaBuilder.lower(root.get("username")), searchTerm),
+						criteriaBuilder.like(criteriaBuilder.lower(root.get("email")), searchTerm)
+				);
+
+				// Combine the search predicate with the friend condition
+				combinedPredicate = criteriaBuilder.and(combinedPredicate, searchPredicate);
+			}
+
+			return combinedPredicate;
 		};
 
+		// Set the page size to 20 by default if it's null
+		final int pageSize = (paginatedRequest.getSize() != null) ? paginatedRequest.getSize() : 20;
 		final PageRequest pageable = PageRequest.of(
 				paginatedRequest.getPage(),
-				paginatedRequest.getSize(),
+				pageSize,
 				Sort.Direction.ASC,
-				"id");
+				"id"
+		);
 
-		final Page<User> events = userRepository.findAll(pageable);
-        return events.map(UserMapper.INSTANCE::toDto);
+		// Apply the Specification along with pagination to the repository's findAll method
+		final Page<User> users = userRepository.findAll(spec, pageable);
+
+		// Convert the User entities to UserDto and return the result
+		return users.map(UserMapper.INSTANCE::toDto);
+	}
+
+	public List<UserDto> getFriends(Long userId) {
+		final Set<User> friends = userRepository.findFriendsByUserId(userId);
+		return friends.stream().map(UserMapper.INSTANCE::toDto).toList();
 	}
 
 	//TODO list friends
@@ -84,6 +109,11 @@ public class UserService {
 				.orElseThrow(() -> new RuntimeException(String.format("Cant find user with username: %s", username)));
 	}
 
+	public List<User> findUsersByUsernamePart(String usernamePart) {
+		final Pageable pageable = PageRequest.of(0, 20);
+		return userRepository.findByUsernameContaining(usernamePart, pageable);
+	}
+
 	public UserDto getUser(Long id) {
 		return UserMapper.INSTANCE.toDto(getById(id));
 	}
@@ -99,10 +129,22 @@ public class UserService {
 	}
 
 	//TODO finish
-	public UserDto updateUser(UserBaseDto userDetails) {
-		final User user = getByUsername(userDetails.getUsername());
-		user.setUsername(userDetails.getUsername());
-		user.setEmail(userDetails.getEmail());
+	public UserDto updateUser(User existingUser, UserBaseDto userDetails) {
+		final User user = getByUsername(existingUser.getUsername());
+		final String prevUsername = userDetails.getUsername();
+		if(prevUsername != null) {
+			final User userWithNewName = getByUsername(userDetails.getUsername());
+			if(userWithNewName == null) {
+				user.setUsername(userDetails.getUsername());
+			}
+			else {
+				throw new IllegalArgumentException("Can't update user. User with username " + userDetails.getUsername() + " already already exists");
+			}
+		}
+		final String email = userDetails.getEmail();
+		if(email != null) {
+			user.setEmail(userDetails.getEmail());
+		}
 		return UserMapper.INSTANCE.toDto(userRepository.save(user));
 	}
 
@@ -143,5 +185,50 @@ public class UserService {
 
 	public List<EventDto> getAllEventsByUserId(Long id) {
 		return eventRepository.findByParticipantsId(id).stream().map(EventMapper.INSTANCE::toDto).toList();
+	}
+
+	@Transactional
+	public boolean addFriend(Long initiatorId, Long friendId) {
+		try {
+			User user = getById(initiatorId);
+			User newFriend = getById(friendId);
+
+			if (user == null || newFriend == null) {
+				return false;
+			}
+
+			if(user == newFriend) {
+				return false;
+			}
+
+			Set<User> friends = user.getFriends();
+			if (friends == null) {
+				friends = new HashSet<>();
+			}
+
+			if (!friends.add(newFriend)) { // Avoid duplicates
+				return false; // Friend was already added
+			}
+
+			// Persist changes
+			user.setFriends(friends);
+			userRepository.save(user); // Ensure userRepository is used for saving
+
+			return true;
+		} catch (Exception ex) {
+			// Log general error
+			return false;
+		}
+	}
+
+	public boolean addFriends(Long initiatorId, List<Long> newFriendsIds) {
+		try {
+			newFriendsIds.forEach(friend -> addFriend(initiatorId, friend));
+			return true;
+		}
+		catch (Exception ex) {
+			System.out.println(ex);
+			return false;
+		}
 	}
 }

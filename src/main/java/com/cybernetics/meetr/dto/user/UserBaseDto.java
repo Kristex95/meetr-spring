@@ -18,4 +18,5 @@ public class UserBaseDto {
     private String password;
 	private List<Long> eventIds;
 	private List<Long> chatIds;
+	private List<Long> friendsIds;
 }
